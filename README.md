@@ -6,6 +6,9 @@ Deploying a keylogger without the explicit consent of all parties involved may v
 
 By using or modifying this software, you acknowledge that you are solely responsible for complying with all applicable laws and regulations. If you are unsure about the legal implications, consult a qualified attorney before proceeding.
 
+# About
+This keylogger is a little side project I did to familiarize myself with Rust. Essentially, it writes all keys pressed on the "victims" keyboard, writes them down in a txt file, and sends the txt file via email every interval specified. Mind you as of now the exe file compiled by the compiler will mark as a virus.
+
 # Setup
 The code works as intended in rustc 1.85.0, all newer and older might work but weren't tested on.
 ## Pre-requisits
