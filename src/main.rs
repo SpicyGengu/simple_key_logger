@@ -93,12 +93,6 @@ async fn send_mail(to_mail_address: &str, from_mail_address: &str, from_mail_add
     // Send the email
     let result = mailer.send(email.clone().into());
 
-    if result.is_ok() {
-        println!("Email sent");
-    } else {
-        println!("Could not send email: {:?}", result);
-    }
-
     assert!(result.is_ok());
 }
 
