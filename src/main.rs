@@ -23,7 +23,7 @@ async fn main() {
     let now = Utc::now();
     let date = now.to_rfc2822();
     let mut sys_time = SystemTime::now();
-    let mail_sending_interval = Duration::from_secs(10);
+    let mail_sending_interval = Duration::from_secs(10); // change how often a mail is sent here
     
     loop {
         loop {
